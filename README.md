@@ -3,5 +3,7 @@
 
 * Using `GL_TRIANGLES` to drow English characters.
 * Using `GL_POLYGON` to drow Chinese characters and logo.
-* ![logo]: ./logo4.gif "Example"
 * <img src="./logo4.gif"> </img>
+
+# Homework 2 
+## Dateline: 
