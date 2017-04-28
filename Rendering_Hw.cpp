@@ -1,5 +1,5 @@
 ﻿/***************************
-4103056035 周彤 第2次作業4/11
+4103056035 周彤 第3次作業4/26
 ***************************/
 
 // Rendering_Hw.cpp : 定義主控台應用程式的進入點。
@@ -30,9 +30,12 @@ int turnRun = negZ;
 int lookAngle = 0;
 int nowMethod = 1;
 int rotateType = 0;
+int jumpT = 0;
+bool flag = false;
 
-float angle = 0.0;
-GLdouble eyeX = 0.0, eyeY = 0.0, eyeZ = 0.0, lookX = 0.0, lookY = 0.0, lookZ = -1.0;
+float angleX = 0.0, angleY = 0.0, angleZ = 0.0;
+GLdouble eyeX = 0.0, eyeY = 0.0, eyeZ = 0.0;
+float jumpY[361];
 int index[10000];
 
 static double limitFPS = 1.0 / 60.0;
@@ -186,7 +189,8 @@ void drowDa(void){
 }
 
 void drowSh(void){
-	int part[] = { 5, 8, 5, 8, 8, 6, 6, 5, 5, 5, 5, 9 };
+	int part[] = { 5, 8, 5, 8, 8, 6, 6, 5, 5, 5, 5, 9, 4, 4, 4, 6, 3,
+		4, 7, 4, 6, 7, 5, 4, 4, 4, 6};
 	int x = 0;
 	glInterleavedArrays(GL_C3F_V3F, 0, Sh);
 	if (nowMethod == DRAWARRAY){
@@ -201,11 +205,6 @@ void drowSh(void){
 			x += part[num];
 		}
 	}
-	
-	
-
-
-
 	//fp << 0 << "," << 0.4 << "," << 0.6 << "," << 515 / 755.0 << "," << 1.0 - 35 / 221.0 << "0,0," << std::endl;
 }
 
@@ -314,65 +313,98 @@ void drowh(){
 	//
 }
 
-void rotatedFunc(){
-	angle += 0.1;
-	if (angle > 360)	angle -= 360;
+void initJumpY(){
+	for (int i = 0; i < 180; i++)
+		jumpY[i] = 0 - 9.8 / 2.0 * (0.0025*(i + 1)) * (0.0025 * (i + 1));
+	for (int i = 180; i < 361; i++)
+		jumpY[i] = 0 - 9.8 / 2.0 * (0.0025*(360 - i)) * (0.0025 * (360 - i));
+}
+
+void rotatedFunc(int value){
+	if (rotateType == YAXIS){
+		angleY += 1;
+		if (angleY > 360)	angleY -= 360;
+		glutPostRedisplay();
+		value++;
+		if (value < 90)
+			glutTimerFunc(10, rotatedFunc, value);
+	}
+	else if (rotateType == XAXIS){
+		angleX += 2;
+		if (angleX > 360)	angleX -= 360;
+		glutPostRedisplay();
+	}
+	else{
+		angleZ += 2;
+		if (angleZ > 360)	angleZ -= 360;
+		glutPostRedisplay();
+	}
+}
+
+void jump(){
+	eyeY = jumpY[jumpT];
+	glutPostRedisplay();
+	jumpT++;
+	if (jumpT >= 361){
+		jumpT = 0;
+		glutIdleFunc(NULL);
+	}
+}
+
+void backward(){
+	if (turnRun == posX)
+		eyeX -= 0.1;
+	else if (turnRun == negX)
+		eyeX += 0.1;
+	else if (turnRun == posZ)
+		eyeZ -= 0.1;
+	else if (turnRun == negZ)
+		eyeZ += 0.1;
+
 	glutPostRedisplay();
 }
 
-void forward(int value){
+void forward(){
 	if (turnRun == posX){
-		eyeX += 0.01;
-		lookX = eyeX + 1.0;
+		eyeX += 0.1;
 	}
 		
 	else if (turnRun == negX){
-		eyeX -= 0.01;
-		lookX = eyeX - 1.0;
+		eyeX -= 0.1;
 	}
 	else if (turnRun == posZ){
-		eyeZ += 0.01;
-		lookZ = eyeZ + 1.0;
+		eyeZ += 0.1;
 	}
 		
 	else if (turnRun == negZ){
-		eyeZ -= 0.01;
-		lookZ = eyeZ - 1.0;
+		eyeZ -= 0.1;
 	}
 		
 	glutPostRedisplay();
 }
 
 void turnLeft(int value){
-
-	turnRun += 1;
-	if (turnRun > 4) turnRun -= 4;
-
-	lookAngle -= 1;
-	if (lookAngle < 0) lookAngle += 360;
-
-	lookZ = eyeZ + cos(lookAngle*unitAngle);
-	lookX = eyeX + sin(lookAngle*unitAngle);
-
+	if (turnRun == posX)
+		eyeZ -= 0.1;
+	else if (turnRun == negX)
+		eyeZ += 0.1;
+	else if (turnRun == posZ)
+		eyeX -= 0.1;
+	else
+		eyeX += 0.1;
 	glutPostRedisplay();
-	if (lookAngle % 90)
-		glutTimerFunc(10, turnLeft, 1);
 }
 
 void turnRight(int value){
-
-	turnRun -= 1;
-	if (turnRun == 0) turnRun += 4;
-
-	lookAngle += 1;
-	if (lookAngle > 360) lookAngle -= 360;
-
-	lookZ = eyeZ + cos(lookAngle*unitAngle);
-	lookX = eyeX + sin(lookAngle*unitAngle);
-
+	if (turnRun == posX)
+		eyeZ += 0.1;
+	else if (turnRun == negX)
+		eyeZ -= 0.1;
+	else if (turnRun == posZ)
+		eyeX += 0.1;
+	else
+		eyeX -= 0.1;
 	glutPostRedisplay();
-	if (lookAngle % 90)
-		glutTimerFunc(10, turnRight, 1);
 }
 
 void display(void)
@@ -381,32 +413,18 @@ void display(void)
 	glClear(GL_COLOR_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	/* draw white polygon (rectangle) with corners at
-	* (0.25, 0.25, 0.0) and (0.75, 0.75, 0.0)
-	*/
 
-	gluLookAt(eyeX, eyeY, eyeZ, lookX, lookY, lookZ, 0.0, 1.0, 0.0);
+	//走路用
+	glTranslatef(eyeX, eyeY, eyeZ);
+
 	glPushMatrix();
 
-	glTranslatef(0.5, 0.5, 0.0);
-	switch (rotateType)
-	{
-	case XAXIS:
-		glRotatef(angle, 0.5, 0, 0);
-		break;
-	case YAXIS:
-		glRotatef(angle, 0, 0.5, 0);
-		break;
-	case ZAXIS:
-		glRotatef(angle, 0, 0, 1.0);
-		break;
-	default:
-		break;
-	}
-	if (angle == 360)
-		angle = 0;
-	
-	glTranslatef(-0.5, -0.5, 0.0);
+	// 轉頭(隨著三個軸心轉)
+	glTranslatef(eyeX, eyeY, eyeZ-2.0);
+	glRotatef(angleX, 1.0, 0, 0);
+	glRotatef(angleY, 0, 1.0, 0);
+	glRotatef(angleZ, 0, 0, 1.0);
+	glTranslatef((0-eyeX), (0-eyeY), (2.0-eyeZ));
 
 	drowN();
 	drowi();
@@ -433,11 +451,10 @@ void display(void)
 	drowDa();
 	drowSh();
 
-	
-
 	glPopMatrix();
 	
-	
+	gluLookAt(1.0, 0.0, 1.0, 0.0, 0.0, 2.0, 0.0, 1.0, 0.0);
+
 	glutSwapBuffers();
 	/* don't wait!
 	* start processing buffered OpenGL routines
@@ -458,8 +475,14 @@ void init(void)
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
-
+	initJumpY();
 	indexArray();
+
+	std::cout << "Dear TA:\n"
+		<< "\tIf you click mouse's middle button, it will rotate 90 degrees.\n"
+		<< "\tBut if you click left or right buton, it will rotate 2 degrees one time.\n"
+		<< "\tNow, I can't forward or backward.\n"
+		<< "\t\t\t\t\t\t\tThanks";
 }
 
 void mouse(int button, int state, int x, int y)
@@ -467,38 +490,29 @@ void mouse(int button, int state, int x, int y)
 	switch (button) {
 	case GLUT_LEFT_BUTTON:
 		if (state == GLUT_DOWN) {
-			if (rotateType == ZAXIS){
-				rotateType = 0;
-				glutIdleFunc(NULL);
-			}
-			else{
-				rotateType = ZAXIS;
-				glutIdleFunc(rotatedFunc);
-			}
+			rotateType = ZAXIS;
+			rotatedFunc(0);
 		}
 		break;
 	case GLUT_MIDDLE_BUTTON:
 		if (state == GLUT_DOWN) {
-			if (rotateType == YAXIS){
+			rotateType = YAXIS;
+			rotatedFunc(0);
+			/*if (rotateType == YAXIS){
 				rotateType = 0;
 				glutIdleFunc(NULL);
 			}
 			else {
 				rotateType = YAXIS;
-				glutIdleFunc(rotatedFunc);
-			}
+				rotatedFunc(0);
+				//glutIdleFunc(rotatedFunc);
+			}*/
 		}
 		break;
 	case GLUT_RIGHT_BUTTON:
 		if (state == GLUT_DOWN) {
-			if (rotateType == XAXIS){
-				rotateType = 0;
-				glutIdleFunc(NULL);
-			}
-			else {
-				rotateType = XAXIS;
-				glutIdleFunc(rotatedFunc);
-			}
+			rotateType = XAXIS;
+			rotatedFunc(0);
 		}
 		break;
 	default:
@@ -509,6 +523,9 @@ void mouse(int button, int state, int x, int y)
 void keyboard(unsigned char key, int x, int y)
 {
 	switch (key) {
+	case 32:	//space
+		glutIdleFunc(jump);
+		break;
 	case 49:	// 49 = '1'
 		nowMethod = DRAWARRAY;
 		break;
@@ -522,7 +539,7 @@ void keyboard(unsigned char key, int x, int y)
 		nowMethod = MULTIDRAWELEMENTS;
 		break;
 	case 'w':
-		forward(0);
+		forward();
 		break;
 	case 'a':
 		turnLeft(0);
@@ -531,6 +548,14 @@ void keyboard(unsigned char key, int x, int y)
 		turnRight(0);
 		break;
 	case 's':
+		backward();
+		break;
+	case 'b':
+		if (flag)
+			glCullFace(GL_BACK);
+		else
+			glCullFace(GL_FRONT_AND_BACK);
+		flag = !flag;
 		break;
 	case 27:
 		exit(0);
