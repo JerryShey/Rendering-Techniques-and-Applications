@@ -1,5 +1,5 @@
 ﻿/***************************
-4103056035 周彤 第3次作業4/26
+4103056035 周彤 第4次作業5/15
 ***************************/
 
 // Rendering_Hw.cpp : 定義主控台應用程式的進入點。
@@ -10,16 +10,12 @@
 #include <fstream>
 #include "myArrays.cpp"
 
-#define unitAngle 3.1415926/180.0
-
 #define DRAWARRAY 1
 #define DRAWELEMENTS 2
 #define MULTIDRAWARRAYS 3
 #define MULTIDRAWELEMENTS 4
 
-#define XAXIS 1
-#define YAXIS 2
-#define ZAXIS 3
+#define angleUnit 3.1415926/180.0
 
 #define negZ 1
 #define negX 2
@@ -33,62 +29,62 @@ int rotateType = 0;
 int jumpT = 0;
 bool flag = false;
 
-float angleX = 0.0, angleY = 0.0, angleZ = 0.0;
+int alpha = 0 ,beta = 0, gamma = 0;	//alpha X-Z, beta Y-Z, gamma X-Y
+GLdouble locationX = 0.0, locationY = 0.0, locationZ = 3.0;
 GLdouble eyeX = 0.0, eyeY = 0.0, eyeZ = 0.0;
+GLdouble testX = 0.0, testY = 0.0, testZ = 2.0;
 float jumpY[361];
+float ShakingArm[21];
+int shakeArm = 0;
 int index[10000];
-
-static double limitFPS = 1.0 / 60.0;
-
-std::fstream fp;
 
 void indexArray(){
 	for (int num = 0; num < 10000; num++)
 		index[num] = num;
 }
 
-void drowCircle(float x, float y, float r, int start, int angle, int color){
-	float pointOut[360][2];
-	int nowAngle = start, cnt = 0;
-	GLfloat certenX = x / 755.0, certenY = 1.0 - y / 221.0;
-	for (int i = 0; nowAngle < (start + angle); i++){
-		pointOut[i][0] = (x + r*cosf(unitAngle*(nowAngle))) / 755.0;
-		pointOut[i][1] = 1.0 - (y + r*sinf(unitAngle*(nowAngle))) / 221.0;
-		nowAngle += 3;
-		cnt++;
-	}
-	if (color)
-		glColor3f(1.0, 1.0, 1.0);
-	else
-		glColor3f(0, 0.4, 0.6);
-	glBegin(GL_TRIANGLES);
-	for (int i = cnt - 1; i > 0; i--){
-		glVertex3f(certenX, certenY, 0.0);
-		glVertex3f(pointOut[i][0] , pointOut[i][1], 0.0);
-		glVertex3f(pointOut[i-1][0], pointOut[i-1][1], 0.0);
-	}
-	/*
-	for (int i = cnt - 1; i > 0; i--){
-		if (color){
-			fp << 1.0 << "," << 1.0 << "," << 1.0 << "," << certenX << "," << certenY << "," << "0.0," << std::endl;
-			fp << 1.0 << "," << 1.0 << "," << 1.0 << "," << pointOut[i][0] << "," << pointOut[i][1] << "," << "0.0," << std::endl;
-			fp << 1.0 << "," << 1.0 << "," << 1.0 << "," << pointOut[i - 1][0] << "," << pointOut[i - 1][1] << "," << "0.0," << std::endl;
-		}
-		else{
-			fp << 0 << "," << 102 / 255.0 << "," << 153 / 255.0 << "," << certenX << "," << certenY << "," << "0.0," << std::endl;
-			fp << 0 << "," << 102 / 255.0 << "," << 153 / 255.0 << "," << pointOut[i][0] << "," << pointOut[i][1] << "," << "0.0," << std::endl;
-			fp << 0 << "," << 102 / 255.0 << "," << 153 / 255.0 << "," << pointOut[i - 1][0] << "," << pointOut[i - 1][1] << "," << "0.0," << std::endl;
-		}
-	}*/
-	glEnd();
-}
+//void drowCircle(float x, float y, float r, int start, int angle, int color){
+//	float pointOut[360][2];
+//	int nowAngle = start, cnt = 0;
+//	GLfloat certenX = x / 755.0, certenY = 1.0 - y / 221.0;
+//	for (int i = 0; nowAngle < (start + angle); i++){
+//		pointOut[i][0] = (x + r*cosf(unitAngle*(nowAngle))) / 755.0;
+//		pointOut[i][1] = 1.0 - (y + r*sinf(unitAngle*(nowAngle))) / 221.0;
+//		nowAngle += 3;
+//		cnt++;
+//	}
+//	if (color)
+//		glColor3f(1.0, 1.0, 1.0);
+//	else
+//		glColor3f(0, 0.4, 0.6);
+//	glBegin(GL_TRIANGLES);
+//	for (int i = cnt - 1; i > 0; i--){
+//		glVertex3f(certenX, certenY, 0.0);
+//		glVertex3f(pointOut[i][0], pointOut[i][1], 0.0);
+//		glVertex3f(pointOut[i - 1][0], pointOut[i - 1][1], 0.0);
+//	}
+//	/*
+//	for (int i = cnt - 1; i > 0; i--){
+//	if (color){
+//	fp << 1.0 << "," << 1.0 << "," << 1.0 << "," << certenX << "," << certenY << "," << "0.0," << std::endl;
+//	fp << 1.0 << "," << 1.0 << "," << 1.0 << "," << pointOut[i][0] << "," << pointOut[i][1] << "," << "0.0," << std::endl;
+//	fp << 1.0 << "," << 1.0 << "," << 1.0 << "," << pointOut[i - 1][0] << "," << pointOut[i - 1][1] << "," << "0.0," << std::endl;
+//	}
+//	else{
+//	fp << 0 << "," << 102 / 255.0 << "," << 153 / 255.0 << "," << certenX << "," << certenY << "," << "0.0," << std::endl;
+//	fp << 0 << "," << 102 / 255.0 << "," << 153 / 255.0 << "," << pointOut[i][0] << "," << pointOut[i][1] << "," << "0.0," << std::endl;
+//	fp << 0 << "," << 102 / 255.0 << "," << 153 / 255.0 << "," << pointOut[i - 1][0] << "," << pointOut[i - 1][1] << "," << "0.0," << std::endl;
+//	}
+//	}*/
+//	glEnd();
+//}
 
 void drowN(void){
 	glColor3f(0, 102.0 / 255.0, 153.0 / 255.0);
 	glInterleavedArrays(GL_C3F_V3F, 0, N);
 	if (nowMethod == DRAWARRAY)	glDrawArrays(GL_TRIANGLES, 0, 18);
 	else if (nowMethod == DRAWELEMENTS)	glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, index);
-	
+
 }
 
 void drowGou(void){
@@ -119,7 +115,7 @@ void drowLi(void){
 			x += part[num];
 		}
 	}
-	else if(nowMethod == DRAWELEMENTS){
+	else if (nowMethod == DRAWELEMENTS){
 		for (int num = 0; num < (sizeof(part) / sizeof(part[0])); num++){
 			glDrawElements(GL_POLYGON, part[num], GL_UNSIGNED_INT, (index + x));
 			x += part[num];
@@ -129,7 +125,7 @@ void drowLi(void){
 }
 
 void drowZhung(void){
-	int part[] = {8, 10, 4, 8, 8, 7};
+	int part[] = { 8, 10, 4, 8, 8, 7 };
 	int x = 0;
 
 	glInterleavedArrays(GL_C3F_V3F, 0, Zhung);
@@ -145,7 +141,7 @@ void drowZhung(void){
 			x += part[num];
 		}
 	}
-	
+
 }
 
 void drowHsing(void){
@@ -164,10 +160,10 @@ void drowHsing(void){
 			x += part[num];
 		}
 	}
-	
+
 	//fp << 0 << "," << 0.4 << "," << 0.6 << "," << 315 / 755.0 << "," << 1.0 - 70 / 221.0 << "0,0," << std::endl;
-	
-	
+
+
 }
 
 void drowDa(void){
@@ -190,7 +186,7 @@ void drowDa(void){
 
 void drowSh(void){
 	int part[] = { 5, 8, 5, 8, 8, 6, 6, 5, 5, 5, 5, 9, 4, 4, 4, 6, 3,
-		4, 7, 4, 6, 7, 5, 4, 4, 4, 6};
+		4, 7, 4, 6, 7, 5, 4, 4, 4, 6 };
 	int x = 0;
 	glInterleavedArrays(GL_C3F_V3F, 0, Sh);
 	if (nowMethod == DRAWARRAY){
@@ -209,14 +205,14 @@ void drowSh(void){
 }
 
 void drowa(){
-	
+
 	glInterleavedArrays(GL_C3F_V3F, 0, a);
 	if (nowMethod == DRAWARRAY)	glDrawArrays(GL_TRIANGLES, 0, 156);
 	else if (nowMethod == DRAWELEMENTS)	glDrawElements(GL_TRIANGLES, 156, GL_UNSIGNED_INT, index);
 }
 
 void drows(){
-	
+
 	glInterleavedArrays(GL_C3F_V3F, 0, s);
 	if (nowMethod == DRAWARRAY)	glDrawArrays(GL_TRIANGLES, 0, 144);
 	else if (nowMethod == DRAWELEMENTS)	glDrawElements(GL_TRIANGLES, 144, GL_UNSIGNED_INT, index);
@@ -313,36 +309,9 @@ void drowh(){
 	//
 }
 
-void initJumpY(){
-	for (int i = 0; i < 180; i++)
-		jumpY[i] = 0 - 9.8 / 2.0 * (0.0025*(i + 1)) * (0.0025 * (i + 1));
-	for (int i = 180; i < 361; i++)
-		jumpY[i] = 0 - 9.8 / 2.0 * (0.0025*(360 - i)) * (0.0025 * (360 - i));
-}
-
-void rotatedFunc(int value){
-	if (rotateType == YAXIS){
-		angleY += 1;
-		if (angleY > 360)	angleY -= 360;
-		glutPostRedisplay();
-		value++;
-		if (value < 90)
-			glutTimerFunc(10, rotatedFunc, value);
-	}
-	else if (rotateType == XAXIS){
-		angleX += 2;
-		if (angleX > 360)	angleX -= 360;
-		glutPostRedisplay();
-	}
-	else{
-		angleZ += 2;
-		if (angleZ > 360)	angleZ -= 360;
-		glutPostRedisplay();
-	}
-}
-
 void jump(){
 	eyeY = jumpY[jumpT];
+	locationY = jumpY[jumpT];
 	glutPostRedisplay();
 	jumpT++;
 	if (jumpT >= 361){
@@ -351,81 +320,125 @@ void jump(){
 	}
 }
 
-void backward(){
-	if (turnRun == posX)
-		eyeX -= 0.1;
-	else if (turnRun == negX)
-		eyeX += 0.1;
-	else if (turnRun == posZ)
-		eyeZ -= 0.1;
-	else if (turnRun == negZ)
-		eyeZ += 0.1;
-
+void stepLeft(){
+	eyeX -= 0.1;
+	locationX -= 0.1;
+	glutPostRedisplay();
+}
+void stepRight(){
+	eyeX += 0.1;
+	locationX += 0.1;
 	glutPostRedisplay();
 }
 
-void forward(){
-	if (turnRun == posX){
-		eyeX += 0.1;
-	}
-		
-	else if (turnRun == negX){
-		eyeX -= 0.1;
-	}
-	else if (turnRun == posZ){
-		eyeZ += 0.1;
-	}
-		
-	else if (turnRun == negZ){
-		eyeZ -= 0.1;
-	}
-		
+void stepForward(){
+	eyeZ -= 0.1;
+	locationZ -= 0.1;
 	glutPostRedisplay();
 }
 
-void turnLeft(int value){
-	if (turnRun == posX)
-		eyeZ -= 0.1;
-	else if (turnRun == negX)
-		eyeZ += 0.1;
-	else if (turnRun == posZ)
-		eyeX -= 0.1;
-	else
-		eyeX += 0.1;
+void stepBackward(){
+	eyeZ += 0.1;
+	locationZ += 0.1;
 	glutPostRedisplay();
 }
 
-void turnRight(int value){
-	if (turnRun == posX)
-		eyeZ += 0.1;
-	else if (turnRun == negX)
-		eyeZ -= 0.1;
-	else if (turnRun == posZ)
-		eyeX += 0.1;
-	else
-		eyeX -= 0.1;
-	glutPostRedisplay();
+void initJumpY(){
+	for (int i = 0; i < 180; i++)
+		jumpY[i] = 9.8 / 2.0 * (0.0025*(i + 1)) * (0.0025 * (i + 1));
+	for (int i = 180; i < 361; i++)
+		jumpY[i] = 9.8 / 2.0 * (0.0025*(360 - i)) * (0.0025 * (360 - i));
+}
+
+void initShakeArm(){
+	for (int i = 0; i < 5; i++){
+		ShakingArm[i] = sin(angleUnit*i * 5) * 0.25;
+		ShakingArm[10 - i] = sin(angleUnit*i * 5) * 0.25;
+		ShakingArm[i + 10] = 0 - sin(angleUnit*i * 5) * 0.25;
+		ShakingArm[20 - i] = 0 - sin(angleUnit*i * 5) * 0.25;
+	}
+	ShakingArm[5] = sin(angleUnit*25) * 0.25;
+	ShakingArm[15] =0 - sin(angleUnit * 25) * 0.25;
+	
+}
+
+void init(void)
+{
+	glClearColor(1.0, 1.0, 1.0, 0.0);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glShadeModel(GL_SMOOTH);
+	initJumpY();
+	initShakeArm();
+	indexArray();
 }
 
 void display(void)
 {
-	/* clear all pixels  */
 	glClear(GL_COLOR_BUFFER_BIT);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+	glColor3f(1.0, 1.0, 1.0);
+	glLoadIdentity();             /* clear the matrix */
+	/* viewing transformation  */
+	gluLookAt(locationX, locationY, locationZ, eyeX, eyeY, eyeZ, 0.0, 2.0, 0.0);
 
-	//走路用
-	glTranslatef(eyeX, eyeY, eyeZ);
+	glColor3f(1.0, 0.0, 0.0);
+	glBegin(GL_LINES);
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(1.0f, 0.0f, 0.0f);
+	glEnd();
 
+	glColor3f(0.0, 1.0, 0.0);
+	glBegin(GL_LINES);
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(0.0f, 1.0f, 0.0f);
+	glEnd();
+
+	glColor3f(0.0, 0.0, 1.0);
+	glBegin(GL_LINES);
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(0.0f, 0.0f, 1.0f);
+	glEnd();
+
+	//glScalef(6.0, 4.0, 1.0);      /* modeling transformation */
+	
+	glPushMatrix();
+	// 畫手臂
 	glPushMatrix();
 
-	// 轉頭(隨著三個軸心轉)
-	glTranslatef(eyeX, eyeY, eyeZ-2.0);
-	glRotatef(angleX, 1.0, 0, 0);
-	glRotatef(angleY, 0, 1.0, 0);
-	glRotatef(angleZ, 0, 0, 1.0);
-	glTranslatef((0-eyeX), (0-eyeY), (2.0-eyeZ));
+	glPushMatrix();
+	glTranslatef(locationX - 0.4, locationY - 0.4 + ShakingArm[20-shakeArm], locationZ - 0.6);
+	glRotatef(45, 0.0, 1.0, 0.0);
+	glRotatef(45, 0.0, 0.0, 1.0);
+	//glTranslatef(0.75, 0.0, 0.0);
 
+	glScalef(0.5, 0.1, 0.1);
+	glutWireCube(1.0);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(locationX + 0.8, locationY - 0.8 + ShakingArm[shakeArm], locationZ - 0.1);
+	glRotatef(315, 0.0, 1.0, 0.0);
+	glRotatef(145, 0.0, 0.0, 1.0);
+	glTranslatef(0.75, 0.0, 0.0);
+
+	glScalef(0.5, 0.1, 0.1);
+	glutWireCube(1.0);
+	glPopMatrix();
+
+	glPopMatrix();
+
+	//繞著軸轉
+	glRotatef(beta, 1.0, 0, 0);
+	glRotatef(gamma, 0, 0, 1.0);
+	//繞著自身轉
+	glTranslatef(locationX, locationY, locationZ);
+	glRotatef(alpha, 0, 1.0, 0);
+	glTranslatef((0 - locationX), (0 - locationY), (0 - locationZ));
+	
+	
+
+	glPushMatrix();
+	
+	glMatrixMode(GL_MODELVIEW);
 	drowN();
 	drowi();
 	drowH();
@@ -452,37 +465,19 @@ void display(void)
 	drowSh();
 
 	glPopMatrix();
-	
-	gluLookAt(1.0, 0.0, 1.0, 0.0, 0.0, 2.0, 0.0, 1.0, 0.0);
 
-	glutSwapBuffers();
-	/* don't wait!
-	* start processing buffered OpenGL routines
-	*/
-	// glFlush ();
+	glPopMatrix();
+
+	glFlush();
 }
 
-void init(void)
+void reshape(int w, int h)
 {
-	/* select clearing color 	*/
-	glClearColor(1.0, 1.0, 1.0, 0.0);
-
-	/*Open file*/
-	//fp.open("All pixel.txt", std::ios::out);
-	//fp << "Start" << std::endl;
-	/* initialize viewing values  */
-	glEnableClientState(GL_VERTEX_ARRAY);
+	glViewport(0, 0, (GLsizei)w, (GLsizei)h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
-	initJumpY();
-	indexArray();
-
-	std::cout << "Dear TA:\n"
-		<< "\tIf you click mouse's middle button, it will rotate 90 degrees.\n"
-		<< "\tBut if you click left or right buton, it will rotate 2 degrees one time.\n"
-		<< "\tNow, I can't forward or backward.\n"
-		<< "\t\t\t\t\t\t\tThanks";
+	glFrustum(-0.2, 0.2, -0.2, 0.2, 0.3, 4.0);
+	glMatrixMode(GL_MODELVIEW);
 }
 
 void mouse(int button, int state, int x, int y)
@@ -490,29 +485,26 @@ void mouse(int button, int state, int x, int y)
 	switch (button) {
 	case GLUT_LEFT_BUTTON:
 		if (state == GLUT_DOWN) {
-			rotateType = ZAXIS;
-			rotatedFunc(0);
+			gamma += 5;
+			if (gamma > 360)
+				gamma -= 360;
+			glutPostRedisplay();
 		}
 		break;
 	case GLUT_MIDDLE_BUTTON:
 		if (state == GLUT_DOWN) {
-			rotateType = YAXIS;
-			rotatedFunc(0);
-			/*if (rotateType == YAXIS){
-				rotateType = 0;
-				glutIdleFunc(NULL);
-			}
-			else {
-				rotateType = YAXIS;
-				rotatedFunc(0);
-				//glutIdleFunc(rotatedFunc);
-			}*/
+			alpha += 5;
+			if (alpha > 360)
+				alpha -= 360;
+			glutPostRedisplay();
 		}
 		break;
 	case GLUT_RIGHT_BUTTON:
 		if (state == GLUT_DOWN) {
-			rotateType = XAXIS;
-			rotatedFunc(0);
+			beta += 5;
+			if (beta > 360)
+				beta -= 360;
+			glutPostRedisplay();
 		}
 		break;
 	default:
@@ -526,36 +518,59 @@ void keyboard(unsigned char key, int x, int y)
 	case 32:	//space
 		glutIdleFunc(jump);
 		break;
-	case 49:	// 49 = '1'
-		nowMethod = DRAWARRAY;
-		break;
-	case 50:
-		nowMethod = DRAWELEMENTS;
-		break;
-	case 51:
-		nowMethod = MULTIDRAWARRAYS;
-		break;
-	case 52:
-		nowMethod = MULTIDRAWELEMENTS;
-		break;
-	case 'w':
-		forward();
-		break;
 	case 'a':
-		turnLeft(0);
+		stepLeft();
+		shakeArm += 1;
+		if (shakeArm > 20)
+			shakeArm -= 20;
 		break;
 	case 'd':
-		turnRight(0);
+		stepRight();
+		shakeArm += 1;
+		if (shakeArm > 20)
+			shakeArm -= 20;
+		break;
+	case 'w':
+		stepForward();
+		shakeArm += 1;
+		if (shakeArm > 20)
+			shakeArm -= 20;
 		break;
 	case 's':
-		backward();
+		stepBackward();
+		shakeArm += 1;
+		if (shakeArm > 20)
+			shakeArm -= 20;
 		break;
-	case 'b':
-		if (flag)
-			glCullFace(GL_BACK);
-		else
-			glCullFace(GL_FRONT_AND_BACK);
-		flag = !flag;
+	case 'i':
+		testZ -= 0.1;
+		std::cout << "X:" <<testX << "\tY:" << testY << "\tZ:" << testZ << std::endl;
+		glutPostRedisplay();
+		break;
+	case 'k':
+		testZ += 0.1;
+		std::cout << "X:" << testX << "\tY:" << testY << "\tZ:" << testZ << std::endl;
+		glutPostRedisplay();
+		break;
+	case 'j':
+		testX -= 0.1;
+		std::cout << "X:" << testX << "\tY:" << testY << "\tZ:" << testZ << std::endl;
+		glutPostRedisplay();
+		break;
+	case 'l':
+		testX += 0.1;
+		std::cout << "X:" << testX << "\tY:" << testY << "\tZ:" << testZ << std::endl;
+		glutPostRedisplay();
+		break;
+	case 'o':
+		testY -= 0.1;
+		std::cout << "X:" << testX << "\tY:" << testY << "\tZ:" << testZ << std::endl;
+		glutPostRedisplay();
+		break;
+	case 'u':
+		testY += 0.1;
+		std::cout << "X:" << testX << "\tY:" << testY << "\tZ:" << testZ << std::endl;
+		glutPostRedisplay();
 		break;
 	case 27:
 		exit(0);
@@ -563,26 +578,19 @@ void keyboard(unsigned char key, int x, int y)
 	}
 }
 
-/*
-* Declare initial window size, position, and display mode
-* (single buffer and RGBA).  Open window with "hello"
-* in its title bar.  Call initialization routines.
-* Register callback function to display graphics.
-* Enter main loop and process events.
-*/
 int main(int argc, char** argv)
 {
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(755, 221);
+	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+	glutInitWindowSize(700, 500);
 	glutInitWindowPosition(100, 100);
-	glutCreateWindow("NCHU logo");
+	glutCreateWindow(argv[0]);
 	init();
-	glewInit();
 	glutDisplayFunc(display);
+	glutReshapeFunc(reshape);
 	glutMouseFunc(mouse);
 	glutKeyboardFunc(keyboard);
 	glutMainLoop();
-	return 0;   /* ANSI C requires main to return int. */
+	return 0;
 }
-
+
