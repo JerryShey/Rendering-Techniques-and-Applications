@@ -29,7 +29,7 @@ int rotateType = 0;
 int jumpT = 0;
 bool flag = false;
 
-int alpha = 0 ,beta = 0, gamma = 0;	//alpha X-Z, beta Y-Z, gamma X-Y
+int alpha = 0, beta = 0, gamma = 0;	//alpha X-Z, beta Y-Z, gamma X-Y
 GLdouble locationX = 0.0, locationY = 0.0, locationZ = 3.0;
 GLdouble eyeX = 0.0, eyeY = 0.0, eyeZ = 0.0;
 GLdouble testX = 0.0, testY = 0.0, testZ = 2.0;
@@ -37,6 +37,12 @@ float jumpY[361];
 float ShakingArm[21];
 int shakeArm = 0;
 int index[10000];
+
+GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+GLfloat mat_shininess[] = { 50.0 };
+GLfloat light_position[] = { 1.0, 1.0, 1.0, 0.0 };
+GLfloat white_light[] = { 1.0, 1.0, 1.0, 1.0 };
+GLfloat lmodel_ambient[] = { 0.1, 0.1, 0.1, 1.0 };
 
 void indexArray(){
 	for (int num = 0; num < 10000; num++)
@@ -80,7 +86,6 @@ void indexArray(){
 //}
 
 void drowN(void){
-	glColor3f(0, 102.0 / 255.0, 153.0 / 255.0);
 	glInterleavedArrays(GL_C3F_V3F, 0, N);
 	if (nowMethod == DRAWARRAY)	glDrawArrays(GL_TRIANGLES, 0, 18);
 	else if (nowMethod == DRAWELEMENTS)	glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, index);
@@ -309,6 +314,164 @@ void drowh(){
 	//
 }
 
+void drowArm(){
+
+	// Dorw Left Arm
+	glPushMatrix();
+	//glutSolidSphere(1.0, 20, 16);
+	glPushMatrix();
+	/*glTranslatef(locationX - 0.3, locationY - 0.3 + ShakingArm[20 - shakeArm], locationZ - 0.3);
+	glRotatef(45, 0.0, 0.0, 1.0);
+	glRotatef(45, 0.0, 1.0, 0.0);
+	/***** Drow Fingers *****/
+	/*glPushMatrix();
+	glTranslatef(0.275, 0.035, 0.0375);
+	glPushMatrix();
+	glTranslatef(0.05, 0.0, -0.0125);
+	glRotatef(30, 0.0, 1.0, 0.0);
+	glScalef(0.05, 0.03, 0.025);
+	glutWireCube(1.0);
+	glPopMatrix();
+	glScalef(0.05, 0.03, 0.025);
+	glutWireCube(1.0);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.285, 0.035, -0.05);
+	glRotatef(30, 0.0, 1.0, 0.0);
+	glPushMatrix();
+	glTranslatef(0.072, 0.0, 0.02);
+	glRotatef(300, 0.0, 1.0, 0.0);
+	glScalef(0.07, 0.03, 0.025);
+	glutWireCube(1.0);
+	glPopMatrix();
+	glScalef(0.07, 0.03, 0.025);
+	glutWireCube(1.0);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.285, 0.0, -0.05);
+	glRotatef(30, 0.0, 1.0, 0.0);
+	glPushMatrix();
+	glTranslatef(0.072, 0.0, 0.02);
+	glRotatef(300, 0.0, 1.0, 0.0);
+	glScalef(0.07, 0.03, 0.025);
+	glutWireCube(1.0);
+	glPopMatrix();
+	glScalef(0.07, 0.03, 0.025);
+	glutWireCube(1.0);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.285, -0.035, -0.05);
+	glRotatef(30, 0.0, 1.0, 0.0);
+	glPushMatrix();
+	glTranslatef(0.072, 0.0, 0.02);
+	glRotatef(300, 0.0, 1.0, 0.0);
+	glScalef(0.07, 0.03, 0.025);
+	glutWireCube(1.0);
+	glPopMatrix();
+	glScalef(0.07, 0.03, 0.025);
+	glutWireCube(1.0);
+	glPopMatrix();
+
+	/************************/
+
+	/*glScalef(0.5, 0.1, 0.1);
+	glutWireCube(1.0);
+	glPopMatrix();
+	//glutSolidSphere(1.0, 20, 20);
+
+	//Drow Right Arm
+	glPushMatrix();
+	glTranslatef(locationX + 0.3, locationY - 0.3 + ShakingArm[shakeArm], locationZ - 0.3);
+	glRotatef(325, 0.0, 0.0, 1.0);
+	glRotatef(315, 0.0, 1.0, 0.0);
+
+	/***** Drow Fingers *****/
+	/*glPushMatrix();
+	glTranslatef(-0.275, -0.035, 0.0375);
+	glPushMatrix();
+	glTranslatef(-0.05, 0.016, 0.0);
+	glRotatef(330, 0.0, 0.0, 1.0);
+	glScalef(0.05, 0.03, 0.025);
+	glutWireCube(1.0);
+	glPopMatrix();
+	glScalef(0.05, 0.03, 0.025);
+	glutWireCube(1.0);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(-0.285, 0.055, -0.0375);
+	glRotatef(330, 0.0, 0.0, 1.0);
+	glPushMatrix();
+	glTranslatef(-0.075, -0.018, 0.0);
+	glRotatef(30, 0.0, 0.0, 1.0);
+	glScalef(0.07, 0.03, 0.025);
+	glutWireCube(1.0);
+	glPopMatrix();
+	glScalef(0.07, 0.03, 0.025);
+	glutWireCube(1.0);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(-0.285, 0.055, 0.0);
+	glRotatef(330, 0.0, 0.0, 1.0);
+	glPushMatrix();
+	glTranslatef(-0.075, -0.018, 0.0);
+	glRotatef(30, 0.0, 0.0, 1.0);
+	glScalef(0.07, 0.03, 0.025);
+	glutWireCube(1.0);
+	glPopMatrix();
+	glScalef(0.07, 0.03, 0.025);
+	glutWireCube(1.0);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(-0.285, 0.055, 0.0375);
+	glRotatef(330, 0.0, 0.0, 1.0);
+	glPushMatrix();
+	glTranslatef(-0.075, -0.018, 0.0);
+	glRotatef(30, 0.0, 0.0, 1.0);
+	glScalef(0.07, 0.03, 0.025);
+	glutWireCube(1.0);
+	glPopMatrix();
+	glScalef(0.07, 0.03, 0.025);
+	glutWireCube(1.0);
+	glPopMatrix();
+	/************************/
+
+	/*glPushMatrix();
+
+	glPushMatrix();
+
+	glPopMatrix();
+	glPushMatrix();
+
+	glPopMatrix();
+	glPushMatrix();
+
+	glPopMatrix();
+	glPushMatrix();
+
+	glPopMatrix();
+	glPushMatrix();
+
+	glPopMatrix();
+	glPushMatrix();
+	glScalef(0.5, 0.1, 0.1);
+	glutWireSphere(1.0, 20, 60);
+	glPopMatrix();
+
+	glPopMatrix();*/
+
+	//glScalef(0.5, 0.1, 0.1);
+	glutWireCube(1.0);
+	glutSolidSphere(0.2, 50, 50);
+	glPopMatrix();
+	glPopMatrix();
+}
+
 void jump(){
 	eyeY = jumpY[jumpT];
 	locationY = jumpY[jumpT];
@@ -319,7 +482,6 @@ void jump(){
 		glutIdleFunc(NULL);
 	}
 }
-
 void stepLeft(){
 	eyeX -= 0.1;
 	locationX -= 0.1;
@@ -330,13 +492,11 @@ void stepRight(){
 	locationX += 0.1;
 	glutPostRedisplay();
 }
-
 void stepForward(){
 	eyeZ -= 0.1;
 	locationZ -= 0.1;
 	glutPostRedisplay();
 }
-
 void stepBackward(){
 	eyeZ += 0.1;
 	locationZ += 0.1;
@@ -349,7 +509,6 @@ void initJumpY(){
 	for (int i = 180; i < 361; i++)
 		jumpY[i] = 9.8 / 2.0 * (0.0025*(360 - i)) * (0.0025 * (360 - i));
 }
-
 void initShakeArm(){
 	for (int i = 0; i < 5; i++){
 		ShakingArm[i] = sin(angleUnit*i * 5) * 0.25;
@@ -357,16 +516,31 @@ void initShakeArm(){
 		ShakingArm[i + 10] = 0 - sin(angleUnit*i * 5) * 0.25;
 		ShakingArm[20 - i] = 0 - sin(angleUnit*i * 5) * 0.25;
 	}
-	ShakingArm[5] = sin(angleUnit*25) * 0.25;
-	ShakingArm[15] =0 - sin(angleUnit * 25) * 0.25;
-	
-}
+	ShakingArm[5] = sin(angleUnit * 25) * 0.25;
+	ShakingArm[15] = 0 - sin(angleUnit * 25) * 0.25;
 
+}
 void init(void)
 {
-	glClearColor(1.0, 1.0, 1.0, 0.0);
+	GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat mat_shininess[] = { 100.0 };
+	GLfloat black_emission[] = { 0.0, 0.0, 0.0, 1.0 };
+	GLfloat light_position[] = { 1.0, 1.0, 0.0, 0.0 };
+	GLfloat white_light[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat lmodel_ambient[] = { 0.0, 0.0, 0.1, 1.0 };
+
+	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glShadeModel(GL_SMOOTH);
+
+	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+	glMaterialfv(GL_FRONT, GL_EMISSION, black_emission);
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, white_light);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, white_light);
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lmodel_ambient);
+
 	initJumpY();
 	initShakeArm();
 	indexArray();
@@ -374,8 +548,7 @@ void init(void)
 
 void display(void)
 {
-	glClear(GL_COLOR_BUFFER_BIT);
-	glColor3f(1.0, 1.0, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();             /* clear the matrix */
 	/* viewing transformation  */
 	gluLookAt(locationX, locationY, locationZ, eyeX, eyeY, eyeZ, 0.0, 2.0, 0.0);
@@ -386,58 +559,39 @@ void display(void)
 	glVertex3f(1.0f, 0.0f, 0.0f);
 	glEnd();
 
-	glColor3f(0.0, 1.0, 0.0);
-	glBegin(GL_LINES);
-	glVertex3f(0.0f, 0.0f, 0.0f);
-	glVertex3f(0.0f, 1.0f, 0.0f);
-	glEnd();
-
 	glColor3f(0.0, 0.0, 1.0);
 	glBegin(GL_LINES);
 	glVertex3f(0.0f, 0.0f, 0.0f);
 	glVertex3f(0.0f, 0.0f, 1.0f);
 	glEnd();
 
-	//glScalef(6.0, 4.0, 1.0);      /* modeling transformation */
-	
-	glPushMatrix();
-	// 畫手臂
-	glPushMatrix();
+	glColor3f(0.0, 1.0, 0.0);
+	glBegin(GL_LINES);
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(0.0f, 1.0f, 0.0f);
+	glEnd();
+
+	glColor3f(0.0, 0.0, 0.0);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_DEPTH_TEST);
+	drowArm();
+	glDisable(GL_LIGHTING);
+	glDisable(GL_LIGHT0);
+	glDisable(GL_DEPTH_TEST);
 
 	glPushMatrix();
-	glTranslatef(locationX - 0.4, locationY - 0.4 + ShakingArm[20-shakeArm], locationZ - 0.6);
-	glRotatef(45, 0.0, 1.0, 0.0);
-	glRotatef(45, 0.0, 0.0, 1.0);
-	//glTranslatef(0.75, 0.0, 0.0);
-
-	glScalef(0.5, 0.1, 0.1);
-	glutWireCube(1.0);
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslatef(locationX + 0.8, locationY - 0.8 + ShakingArm[shakeArm], locationZ - 0.1);
-	glRotatef(315, 0.0, 1.0, 0.0);
-	glRotatef(145, 0.0, 0.0, 1.0);
-	glTranslatef(0.75, 0.0, 0.0);
-
-	glScalef(0.5, 0.1, 0.1);
-	glutWireCube(1.0);
-	glPopMatrix();
-
-	glPopMatrix();
-
 	//繞著軸轉
-	glRotatef(beta, 1.0, 0, 0);
+
 	glRotatef(gamma, 0, 0, 1.0);
+
 	//繞著自身轉
 	glTranslatef(locationX, locationY, locationZ);
+	glRotatef(beta, 1.0, 0, 0);
 	glRotatef(alpha, 0, 1.0, 0);
 	glTranslatef((0 - locationX), (0 - locationY), (0 - locationZ));
-	
-	
 
 	glPushMatrix();
-	
 	glMatrixMode(GL_MODELVIEW);
 	drowN();
 	drowi();
@@ -463,9 +617,7 @@ void display(void)
 	drowHsing();
 	drowDa();
 	drowSh();
-
 	glPopMatrix();
-
 	glPopMatrix();
 
 	glFlush();
@@ -544,7 +696,7 @@ void keyboard(unsigned char key, int x, int y)
 		break;
 	case 'i':
 		testZ -= 0.1;
-		std::cout << "X:" <<testX << "\tY:" << testY << "\tZ:" << testZ << std::endl;
+		std::cout << "X:" << testX << "\tY:" << testY << "\tZ:" << testZ << std::endl;
 		glutPostRedisplay();
 		break;
 	case 'k':
@@ -581,7 +733,7 @@ void keyboard(unsigned char key, int x, int y)
 int main(int argc, char** argv)
 {
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(700, 500);
 	glutInitWindowPosition(100, 100);
 	glutCreateWindow(argv[0]);
